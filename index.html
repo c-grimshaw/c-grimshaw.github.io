@@ -12,36 +12,41 @@
     body {
       font-family: 'DM Sans', sans-serif;
       height: 100%;
-      padding: 2em;
+      padding: 2em
     }
 
     main {
-      align-items: center;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       height: 100%;
-      max-width: 700px;
+      justify-content: center;
       margin: 0 auto;
+      max-width: 700px
     }
 
-    h1 {
+    h1,
+    ul {
       margin: 0;
-      margin-right: auto;
+      margin-right: auto
     }
 
     p {
-      line-height: 1.5rem;
+      line-height: 1.5rem
     }
 
     ul {
       display: flex;
-      gap: 0.5em;
+      gap: .5em;
       list-style: none;
+      padding-left: 0
+    }
+
+    p>a {
+      color: rgb(59, 130, 246);
     }
 
     li>a {
-      color: black;
+      color: #000
     }
   </style>
 </head>
@@ -52,13 +57,19 @@
 
     <p>
       hi there 👋 i'm charlie grimshaw, naval officer and software engineer. i
-      work as a system security engineer, focused on platform security. i wrote
-      my master's thesis on graph anomaly detection methods.
+      work as a system security engineer, focused on platform security.
+    </p>
+
+    <p>
+      i wrote my master's thesis on detecting anomalous network connections with graph
+      neural networks, which i completed with help from deloitte's incredible anomaly
+      detection research team.
     </p>
 
     <p>
       in my spare time, you'll catch me chasing after my wonderful fiancée (<a
-        href="https://olympic.ca/team-canada/erin-teschuk/">and never catching her</a>).
+        href="https://olympic.ca/team-canada/erin-teschuk/">and never catching
+        her</a>), or putting in hours at my favourite local café.
     </p>
 
 
