@@ -1,7 +1,7 @@
 ---
 title: concurrent drill
 date: 2023-11-30T13:40:03-05:00
-draft: true
+draft: false
 ---
 
 Concurrent programming is a difficult thing to get right, and I think that fact

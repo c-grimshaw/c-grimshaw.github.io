@@ -6,6 +6,15 @@
     <description>Recent content in technical on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Thu, 30 Nov 2023 13:40:03 -0500</lastBuildDate>
     <atom:link href="https://example.org/writing/technical/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>concurrent drill</title>
+      <link>https://example.org/writing/technical/go-primer/</link>
+      <pubDate>Thu, 30 Nov 2023 13:40:03 -0500</pubDate>
+      <guid>https://example.org/writing/technical/go-primer/</guid>
+      <description>Concurrent programming is a difficult thing to get right, and I think that fact prevents some programmers from playing with it. And I think that&amp;rsquo;s unfortunate.
+With that said, I&amp;rsquo;m not familiar with an easier programming language to broach this subject than Go. It&amp;rsquo;s an objectively simple language 1 and most C / Python programmers will find it easy to read. More importantly, some of the spectacular language features will help explain things clearly.</description>
+    </item>
   </channel>
 </rss>

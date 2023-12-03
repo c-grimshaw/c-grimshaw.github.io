@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>concurrent drill | grimblog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300&family=IBM+Plex+Mono:wght@300&display=swap"
+    rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://example.org/css/style.min.82588857b57798aeac3a9c0b2ad9c54a02188e34be35db84179534cbda767f9c.css">
+</head>
+
+<body>
+  <article class="container">
+    <h1>concurrent drill</h1>
+    
+
+<time>30 november 2023</time>
+<br>
+<a href="/writing/">back to writing</a>
+<p>Concurrent programming is a difficult thing to get right, and I think that fact
+prevents some programmers from playing with it. And I think that&rsquo;s
+unfortunate.</p>
+<p>With that said, I&rsquo;m not familiar with an easier programming language to broach
+this subject than Go. It&rsquo;s an objectively simple language <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> and most C / Python
+programmers will find it easy to read. More importantly, some of the
+spectacular language features will help explain things clearly.</p>
+<p>We&rsquo;re going to try and model a contrived military activity using normal
+(synchronous) coding practices, exploring some Go syntax as we progress, and
+we&rsquo;ll see how far it takes us. When we run into issues, we&rsquo;re going to
+introduce concurrency, and evaluate the outcome.</p>
+<p>Let&rsquo;s get underway!</p>
+<h2 id="life-and-times-of-an-officer-cadet">life and times of an officer cadet</h2>
+<p>I can&rsquo;t think of a better candidate for the following exercise than an
+Officer Cadet. They&rsquo;re programmed to do exactly what you tell them, and they
+possess a little less agency when compared to their non-commissioned
+peers.</p>
+<p>Here&rsquo;s how you might model a <code>Cadet</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#75715e">// main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Cadet</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span>: <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">announcePresence</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, reporting for duty!\n&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Cadet</span>{ <span style="color:#e6db74">&#34;charlie&#34;</span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">announcePresence</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// $ go run main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Output:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet charlie, reporting for duty!
+</span></span></span></code></pre></div><p>Looks good, but that function declaration is a little&hellip; <em>Weird</em>.</p>
+<p>That&rsquo;s the syntax for a method definition&ndash; and the preamble before the
+function name is equivalent to <code>self</code>  or  <code>this</code> in other programming
+languages.</p>
+<p>You can read about methods <a href="https://gobyexample.com/methods" class="hover-underline-animation">here</a>
+.</p>
+<h2 id="marching-up-and-down-the-square">marching up and down the square</h2>
+<p>One of the first things recruits learn in the military is drill. Well-executed
+drill movements project discipline to onlookers, and can look pretty cool.</p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/0xvXMEnwyYM?start=206" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<p>However, there&rsquo;s a cadence to drill movements, you see. Frankly, if we&rsquo;re going
+to build our own drill platoon, we&rsquo;ll need to nail the timings.</p>
+<p>Let&rsquo;s consider the time it takes for a cadet to turn three seconds, and define
+a method named <code>Turn()</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#75715e">// main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">Turn</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, starting turn...\n&#34;</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">3</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, finished turning!\n&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Aside from the fact that you don&rsquo;t actually announce turns doing drill, this is
+completely fine. We should scale this together, and put a whole platoon of these
+folks and start booking performances. We&rsquo;d be in the Houston Texan&rsquo;s stadium in
+no time.</p>
+<p>Here&rsquo;s a little team of them:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// instantiate a slice of cadets
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">cadets</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">Cadet</span>{
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;boggis&#34;</span>},
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;bunce&#34;</span>},
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;bean&#34;</span>},
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Alright. Three cadets, ready to turn on my command. How do I issue a command to
+all of them? Well, unlike the real military, yelling won&rsquo;t move things along,
+so let&rsquo;s try iterating over the cadets and issuing each one a <code>Turn()</code>.</p>
+<p>While we&rsquo;re at it, for undisclosed reasons, let&rsquo;s measure the time it takes for
+this whole affair to transpire.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#75715e">// main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// &lt;SNIP&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadets</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">Cadet</span>{
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;boggis&#34;</span>},
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;bunce&#34;</span>},
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;bean&#34;</span>},
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">start</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()        
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">start</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// $ go run main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bunce starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bunce finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bean starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bean finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 9.00379525s
+</span></span></span></code></pre></div><p>The output looks great! Really great! Wait&hellip;</p>
+<p>No, seriously, wait. Chances are, you&rsquo;re still waiting. You&rsquo;re waiting nine
+seconds, at the minimum. This is, as we say in the military, UNSAT <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
+<p>This sort of movement is <em>supposed</em> to be done in unison, so it <em>should</em> be
+taking three seconds, max. We&rsquo;ve tried nothing, and we&rsquo;re all out of ideas.</p>
+<h2 id="everything-everywhere-all-at-once"><del>everything everywhere</del> all at once</h2>
+<p>We need to think outside of the box, because I can&rsquo;t think of a typical
+programming construct that will let us model this <strong>&ldquo;unison&rdquo;</strong> behaviour.</p>
+<p>Perhaps, given the subject of this article, you&rsquo;ve recognized a case for concurrency.
+We want to do multiple things <em>at once</em>. This clearly maps to the textbook definition of
+programmatic concurrency:</p>
+<blockquote>
+<p><em>Concurrency is when tasks can start, complete, and run in overlapping time periods.</em></p>
+</blockquote>
+<p>We want these cadets to turn at the same time. Now, the real punch line is how easy it is
+to express this behaviour in Go.</p>
+<p>The (titular, and comically simple) answer to this problem is two letters: <code>go</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()        
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Within the loop, this simple addition tells the program to execute each
+<code>cadet.Turn()</code> in a separate, lightweight thread of execution called a <code>goroutine</code>.</p>
+<p>Emphasis on lightweight. As of writing, each <code>goroutine</code> invocation incurs
+about 2 kB of memory on the stack. Consequently, it&rsquo;s possible to spawn over a
+million goroutines concurrently. This is in stark comparison to OS-level
+threads, which delve into the kernel and incur much more overhead.</p>
+<p>Don&rsquo;t take my word for it though, let&rsquo;s run this program.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ go run main.go
+</span></span><span style="display:flex;"><span>58.542µs
+</span></span><span style="display:flex;"><span>Cadet bunce starting turn...
+</span></span></code></pre></div><p>See footnote. <sup id="fnref1:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
+<p>Looks like our program executed in a few microseconds, which doesn&rsquo;t leave a lot of room for
+drill. We&rsquo;re left more confused than when we started.</p>
+<p>I encourage you to run this program a few more times. You&rsquo;ll probably get
+different output each time. Try to reason about is happening.</p>
+<hr>
+<p>Ready? Here&rsquo;s what happened above:</p>
+<ol>
+<li>The Go runtime scheduled each <code>cadet.Turn()</code> to be executed concurrently, alongside the <code>main</code> thread.</li>
+<li>Once the loop finished, the <code>main</code> thread of execution kept running.</li>
+<li>Before hitting the end of <code>main</code>, the <code>Cadet{&quot;bunce&quot;}.Turn()</code> goroutine began execution.</li>
+<li>Then the program ended, because <code>main</code> finished.</li>
+</ol>
+<p>The program doesn&rsquo;t wait until all goroutines are done executing. The head
+honcho, <code>main</code>, calls the shots. As you may have observed, point 3 is
+completely non-deterministic in this context.</p>
+<p>Evidently, we need a way to tell the <code>main</code> thread to wait. Here&rsquo;s a simple solution:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#a6e22e">start</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()        
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">start</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// $ go run main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Output:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bunce starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bean starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bean finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bunce finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 4.000826042s
+</span></span></span></code></pre></div><p>Mission accomplished, and for real this time. Maybe you&rsquo;re wondering why the order of
+execution isn&rsquo;t the same as scheduled, and for that, you&rsquo;re going to need to
+take it up with the scheduler.</p>
+<p>A more pressing issue is how depressingly hacky this solution feels&ndash; Inserting
+<code>time.Sleep</code> to orchestrate threads is a valid strategy, but it&rsquo;s not a very
+good one. For example, we won&rsquo;t always know how long to <code>Sleep</code> for.</p>
+<p>Let&rsquo;s explore a better synchronization strategy.</p>
+<h2 id="hurry-up-and-wait">hurry up and wait</h2>
+<p>The Go standard library provides the <code>sync</code> package, which includes the <code>WaitGroup</code> object.</p>
+<p>This object will help us express the following behaviour:</p>
+<ol>
+<li>Launch all goroutines</li>
+<li>Wait (in the main thread) for all goroutines to run to completion</li>
+<li>Finally, continue executing in the main thread</li>
+</ol>
+<p>Under the hood, a <code>WaitGroup</code> is a simple counter. Increment the count with
+<code>Add</code> and decrement it with <code>Done</code>. <code>WaitGroup.Wait()</code> will block the current
+thread if the counter is non-zero, and continue execution otherwise. Easy!</p>
+<p>We need to modify our <code>Turn</code> method signature to accept a pointer to the
+<code>WaitGroup</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;sync&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">Turn</span>(<span style="color:#a6e22e">wg</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">WaitGroup</span>) { 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, starting turn...\n&#34;</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, finished turning!\n&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Done</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// SNIP
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">wg</span> <span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">WaitGroup</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Add</span>(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">wg</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Wait</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// $ go run main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bean starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bunce starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis starting turn...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bunce finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bean finished turn!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 3.001287583s
+</span></span></span></code></pre></div><p>This is much better. We can scale up the number of cadets, or tinker with the
+amount of work done in the <code>Turn</code> method without worrying about syncing up
+the main thread. Sweet!</p>
+<p>Let&rsquo;s take stock, though. It&rsquo;s unfortunate that we needed to modify the
+signature of an otherwise perfectly fine method to do our concurrent bidding.</p>
+<p>We&rsquo;ve lost the ability to tell a <code>Cadet</code> to turn without a <code>sync.WaitGroup</code>
+lying around, which is a significant change to our API. Thankfully,
+there&rsquo;s a more idiomatic solution.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;sync&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">Turn</span>() { 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, starting turn...&#34;</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, finished turning!&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">wg</span> <span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">WaitGroup</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Add</span>(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Done</span>()
+</span></span><span style="display:flex;"><span>        }()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Wait</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This is an example of an <em>anonymous function</em> in Go <sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> . Anonymous
+insofar that the function doesn&rsquo;t actually have a name&ndash; we declare it, and
+then immediately execute it. Better still, our locally-scoped function can close
+over <sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>  the <code>wg</code> and <code>cadet</code> variables at each iteration of the loop.</p>
+<p>While it&rsquo;s a little unsightly at first exposure, it&rsquo;s a super-powered feature.
+We&rsquo;ve gift-wrapped a package of synchronous code for concurrent execution. As a
+result, a <code>Cadet</code> retains its straightforward API, and isn&rsquo;t tightly coupled to
+any synchronization primitives. Wow!</p>
+<p>Our final code is available here.</p>
+<h2 id="kaizen-further-reading">kaizen (further reading)</h2>
+<p>The seminal book on concurrency in Go is *drumroll* Concurrency in Go.</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
+By contrast, the Java SE 12 specification is almost 770 pages. Yowza.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>Unsatisfactory.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>In JavaScript, this is more commonly known as an IIFE (pronounced
+&ldquo;iffy&rdquo;), or &ldquo;Immediately Invoked Function Expression&rdquo;.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>These are commonly referred to as <em>closures</em> (because they &ldquo;close over&rdquo;,
+or capture, locally scoped variables). The compiler is smart enough to pass
+references to the variables, which are made available on the heap.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+
+    <hr>
+    <footer>
+  <ul>
+    <a href="https://github.com/c-grimshaw">github</a>
+    <a href="https://www.linkedin.com/in/charlie-grimshaw/">linkedin</a>
+    <a href="mailto:cgrimshaw[at]gmail.com">email</a>
+    <a href="/">home</a>
+  </ul>
+</footer>
+
+  </article>
+</body>
+
+</html>
