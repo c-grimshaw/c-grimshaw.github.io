@@ -154,9 +154,9 @@ taking three seconds, max. We've tried nothing, and we're all out of ideas.
 We need to think outside of the box, because I can't think of a typical 
 programming construct that will let us model this **"unison"** behaviour.
 
-Perhaps, given the subject of this article, you've recognized a case for concurrency.
-We want to do multiple things *at once*. This clearly maps to the textbook definition of
-programmatic concurrency:
+Perhaps, given the subject of this article, you've recognized a case for
+concurrency. We want to do multiple things, well, concurrently. Here's the textbook
+definition of concurrency:
 
 > *Concurrency is when tasks can start, complete, and run in overlapping time periods.*
 
@@ -252,7 +252,7 @@ This object will help us express the following behaviour:
 3. Finally, continue executing in the main thread
 
 Under the hood, a `WaitGroup` is a simple counter. Increment the count with
-`Add` and decrement it with `Done`. `WaitGroup.Wait()` will block the current
+`Add` and decrement it with `Done`. Finally, `Wait` will block the current
 thread if the counter is non-zero, and continue execution otherwise. Easy!
 
 We need to modify our `Turn` method signature to accept a pointer to the

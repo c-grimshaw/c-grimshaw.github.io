@@ -11,7 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300&family=IBM+Plex+Mono:wght@300&display=swap"
     rel="stylesheet">
   
-  <link rel="stylesheet" href="https://example.org/css/style.min.82588857b57798aeac3a9c0b2ad9c54a02188e34be35db84179534cbda767f9c.css">
+  <link rel="stylesheet" href="https://example.org/css/style.min.6ab3fb8a02eca1963b52da40a1422cf6f7206222152ccf863c39c51d4a4caa66.css">
 </head>
 
 <body>
@@ -141,9 +141,9 @@ taking three seconds, max. We&rsquo;ve tried nothing, and we&rsquo;re all out of
 <h2 id="everything-everywhere-all-at-once"><del>everything everywhere</del> all at once</h2>
 <p>We need to think outside of the box, because I can&rsquo;t think of a typical
 programming construct that will let us model this <strong>&ldquo;unison&rdquo;</strong> behaviour.</p>
-<p>Perhaps, given the subject of this article, you&rsquo;ve recognized a case for concurrency.
-We want to do multiple things <em>at once</em>. This clearly maps to the textbook definition of
-programmatic concurrency:</p>
+<p>Perhaps, given the subject of this article, you&rsquo;ve recognized a case for
+concurrency. We want to do multiple things, well, concurrently. Here&rsquo;s the textbook
+definition of concurrency:</p>
 <blockquote>
 <p><em>Concurrency is when tasks can start, complete, and run in overlapping time periods.</em></p>
 </blockquote>
@@ -214,7 +214,7 @@ good one. For example, we won&rsquo;t always know how long to <code>Sleep</code>
 <li>Finally, continue executing in the main thread</li>
 </ol>
 <p>Under the hood, a <code>WaitGroup</code> is a simple counter. Increment the count with
-<code>Add</code> and decrement it with <code>Done</code>. <code>WaitGroup.Wait()</code> will block the current
+<code>Add</code> and decrement it with <code>Done</code>. Finally, <code>Wait</code> will block the current
 thread if the counter is non-zero, and continue execution otherwise. Easy!</p>
 <p>We need to modify our <code>Turn</code> method signature to accept a pointer to the
 <code>WaitGroup</code>.</p>
