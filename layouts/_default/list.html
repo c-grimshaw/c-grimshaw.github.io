@@ -1,0 +1,21 @@
+{{ define "page" }}
+{{ with .Sections }}
+{{ range .ByTitle.Reverse }}
+<h2>{{ .Title }}</h2>
+{{ range .Pages }}
+<a href="{{ .RelPermalink }}">{{ .Title }}</a>
+<br>
+{{ end }}
+{{ end }}
+{{ else }}
+{{ range .Pages }}
+<a href="{{ .RelPermalink }}">{{ .Title }}</a>
+<br>
+{{ end }}
+{{ end }}
+<br>
+<p>
+  My writing, substandard as it may be, is my own. It does not reflect the positions of the Government of Canada, or
+  private entities that I work with.
+</p>
+{{ end }}

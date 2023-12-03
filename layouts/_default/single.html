@@ -1,0 +1,7 @@
+{{ define "page" }}
+<!-- <time>{{ now.Format "2 January 2006" | strings.ToLower }}</time> -->
+{{ if .Date }}<time>{{ .Date | time.Format "2 January 2006" | strings.ToLower }}</time>{{ end }}
+<br>
+<a href="{{ .CurrentSection.Parent.RelPermalink }}">back to {{ .CurrentSection.Parent.Title }}</a>
+{{ .Content }}
+{{ end }}
