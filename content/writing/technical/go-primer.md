@@ -35,18 +35,18 @@ Here's how you might model a `Cadet`.
 import "fmt"
 
 
-struct Cadet {
-    name: string
+type Cadet struct {
+    name string
 }
 
-func (c Cadet) announcePresence() {
+func (c Cadet) announce() {
     fmt.Printf("Cadet %s, reporting for duty!\n", c.name)
 }
 
 func main() {
     cadet := Cadet{ "charlie" }
 
-    cadet.announcePresence()
+    cadet.announce()
 }
 
 // $ go run main.go
@@ -166,9 +166,12 @@ to express this behaviour in Go.
 The (titular, and comically simple) answer to this problem is two letters: `go`
 
 ```golang
+start := time.Now()
 for _, cadet := range cadets {
     go cadet.Turn()        
 }
+elapsed := time.Since(start)
+fmt.Println(elapsed)
 ```
 
 Within the loop, this simple addition tells the program to execute each
@@ -217,8 +220,10 @@ for _, cadet := range cadets {
     go cadet.Turn()        
 }
 
-time.Sleep(4 * time.Second)
-fmt.Println(time.Since(start))
+time.Sleep(3 * time.Second)
+
+elapsed := time.since(start)
+fmt.Println(elapsed)
 
 // $ go run main.go
 // Output:
@@ -228,7 +233,7 @@ fmt.Println(time.Since(start))
 // Cadet bean finished turn!
 // Cadet bunce finished turn!
 // Cadet boggis finished turn!
-// 4.000826042s
+// 3.000826042s
 ```
 
 Mission accomplished, and for real this time. Maybe you're wondering why the order of
@@ -264,7 +269,7 @@ import "sync"
 
 func (c Cadet) Turn(wg *sync.WaitGroup) { 
     fmt.Printf("Cadet %s, starting turn...\n" c.name)
-    time.Sleep(4 * time.Second)
+    time.Sleep(3 * time.Second)
     fmt.Printf("Cadet %s, finished turning!\n", c.name)
     wg.Done()
 }
@@ -306,7 +311,7 @@ import "sync"
 
 func (c Cadet) Turn() { 
     fmt.Printf("Cadet %s, starting turn..." c.name)
-    time.Sleep(4 * time.Second)
+    time.Sleep(3 * time.Second)
     fmt.Printf("Cadet %s, finished turning!", c.name)
 }
 
@@ -346,8 +351,8 @@ The seminal book on concurrency in Go is shockingly {{< link
 [^1]: The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
   By contrast, the Java SE 12 specification is almost 770 pages. Yowza.
 [^2]: Unsatisfactory.
-[^3]: In JavaScript, this is more commonly known as an IIFE (pronounced
+[^3]: In JavaScript, this is commonly referred to as an IIFE (pronounced
     "iffy"), or "Immediately Invoked Function Expression". 
-[^4]: These are commonly referred to as *closures* (because they "close over",
+[^4]: These are better known as *closures* (because they "close over",
     or capture, locally scoped variables). The compiler is smart enough to pass
     references to the variables, which are made available on the heap. 

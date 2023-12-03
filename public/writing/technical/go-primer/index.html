@@ -46,18 +46,18 @@ peers.</p>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Cadet</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span>: <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Cadet</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span> <span style="color:#66d9ef">string</span>
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">announcePresence</span>() {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">announce</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, reporting for duty!\n&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Cadet</span>{ <span style="color:#e6db74">&#34;charlie&#34;</span> }
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">announcePresence</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">announce</span>()
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// $ go run main.go
@@ -151,9 +151,12 @@ definition of concurrency:</p>
 <p>We want these cadets to turn at the same time. Now, the real punch line is how easy it is
 to express this behaviour in Go.</p>
 <p>The (titular, and comically simple) answer to this problem is two letters: <code>go</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#a6e22e">start</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()        
 </span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">elapsed</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">start</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">elapsed</span>)
 </span></span></code></pre></div><p>Within the loop, this simple addition tells the program to execute each
 <code>cadet.Turn()</code> in a separate, lightweight thread of execution called a <code>goroutine</code>.</p>
 <p>Emphasis on lightweight. As of writing, each <code>goroutine</code> invocation incurs
@@ -187,8 +190,10 @@ consequently non-deterministic.</p>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()        
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">start</span>))
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">3</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">elapsed</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">since</span>(<span style="color:#a6e22e">start</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">elapsed</span>)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// $ go run main.go
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Output:
@@ -198,7 +203,7 @@ consequently non-deterministic.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bean finished turn!
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet bunce finished turn!
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis finished turn!
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 4.000826042s
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 3.000826042s
 </span></span></span></code></pre></div><p>Mission accomplished, and for real this time. Maybe you&rsquo;re wondering why the order of
 execution isn&rsquo;t the same as scheduled, and for that, you&rsquo;re going to need to
 take it up with the scheduler.</p>
@@ -224,7 +229,7 @@ thread if the counter is non-zero, and continue execution otherwise. Easy!</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">Turn</span>(<span style="color:#a6e22e">wg</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">WaitGroup</span>) { 
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, starting turn...\n&#34;</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">3</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, finished turning!\n&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Done</span>()
 </span></span><span style="display:flex;"><span>}
@@ -260,7 +265,7 @@ there&rsquo;s a more idiomatic solution.</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#a6e22e">Cadet</span>) <span style="color:#a6e22e">Turn</span>() { 
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, starting turn...&#34;</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">3</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Cadet %s, finished turning!&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">name</span>)
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
@@ -299,11 +304,11 @@ By contrast, the Java SE 12 specification is almost 770 pages. Yowza.&#160;<a hr
 <p>Unsatisfactory.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:3">
-<p>In JavaScript, this is more commonly known as an IIFE (pronounced
+<p>In JavaScript, this is commonly referred to as an IIFE (pronounced
 &ldquo;iffy&rdquo;), or &ldquo;Immediately Invoked Function Expression&rdquo;.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:4">
-<p>These are commonly referred to as <em>closures</em> (because they &ldquo;close over&rdquo;,
+<p>These are better known as <em>closures</em> (because they &ldquo;close over&rdquo;,
 or capture, locally scoped variables). The compiler is smart enough to pass
 references to the variables, which are made available on the heap.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
