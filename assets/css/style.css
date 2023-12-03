@@ -8,6 +8,8 @@ article {
 }
  
 body {
+  color: #eee;
+  background: #152028;
   font-family: 'DM Sans', sans-serif;
   height: 100%;
   padding: 2em;
@@ -57,23 +59,24 @@ ul {
   padding-left: 0
 }
 
-p>a {
-  color: rgb(59, 130, 246);
+a {
+  color: white;
 }
 
-li>a {
-  color: #000;
+p>a {
+  color: rgb(59, 130, 246);
 }
 
 .hover-underline-animation {
   display: inline-block;
   text-decoration: none;
   position: relative;
-  color: white;
+  color: rgb(59, 130, 246);
 }
 
 .hover-underline-animation::after {
   content: '';
+  color: rgb(59, 130, 246);
   position: absolute;
   width: 100%;
   transform: scaleX(0);
@@ -81,7 +84,7 @@ li>a {
   bottom: 0;
   left: 0;
   transform-origin: bottom-middle;
-  background-color: white;
+  background-color: rgb(59, 130, 246);
   transition: transform 0.25s ease-out;
 }
 
@@ -89,18 +92,3 @@ li>a {
   transform: scaleX(1);
   transform-origin: bottom middle;
 }
-
-@media (prefers-color-scheme: dark) {
-  body {
-    color: #eee;
-    background: #152028;
-  }
-
-  a {
-    color: white
-  }
-  li>a {
-    color: white;
-  }
-}
-

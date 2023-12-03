@@ -206,7 +206,7 @@ Ready? Here's what happened above:
 
 The program doesn't wait until all goroutines are done executing. The head
 honcho, `main`, calls the shots. As you may have observed, point 3 is
-completely non-deterministic in this context.
+consequently non-deterministic.
 
 Evidently, we need a way to tell the `main` thread to wait. Here's a simple solution:
 
@@ -338,7 +338,9 @@ Our final code is available here.
 
 ## kaizen (further reading)
 
-The seminal book on concurrency in Go is \*drumroll\* Concurrency in Go.
+The seminal book on concurrency in Go is shockingly {{< link
+"https://www.oreilly.com/library/view/concurrency-in-go/9781491941294/"
+>}}Concurrency in Go{{< /link >}}.
 
 
 [^1]: The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
