@@ -23,17 +23,22 @@
 <time>30 november 2023</time>
 <br>
 <a href="/writing/">back to writing</a>
-<p>Concurrent programming is a difficult thing to get right, and I think that fact
-prevents some programmers from playing with it. And I think that&rsquo;s
-unfortunate.</p>
-<p>With that said, I&rsquo;m not familiar with an easier programming language to broach
-this subject than Go. It&rsquo;s an objectively simple language <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> and most C / Python
+<p>Concurrency&ndash; managing multiple threads of execution&ndash; is a difficult thing to
+get right.</p>
+<p>The wild west of concurrent execution is a stark departure from the
+well-trodden path of sequential programming, and can quickly introduce errors.
+I think this added complexity prevents some programmers from messing around
+with it.</p>
+<p>&hellip;And I think that&rsquo;s unfortunate, because suckin&rsquo; at something is the first
+step to being sorta good at something <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> .</p>
+<p>With that said, I&rsquo;m not familiar with a better programming language to broach
+this subject than Go. Objectively, it&rsquo;s a simple language <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> and most
 programmers will find it easy to read. More importantly, some of the
-spectacular language features will help explain things clearly.</p>
-<p>We&rsquo;re going to try and model a contrived military activity using normal
-(synchronous) coding practices, exploring some Go syntax as we progress, and
-we&rsquo;ll see how far it takes us. When we run into issues, we&rsquo;re going to
-introduce concurrency, and evaluate the outcome.</p>
+spectacular language features will explain concurrent execution clearly.</p>
+<p>Using a practical example, we&rsquo;re going to try and model a contrived military
+activity using normal (synchronous) coding practices, exploring some Go syntax
+as we progress, and we&rsquo;ll see how far it takes us. Then, when we run into
+issues, we&rsquo;ll introduce concurrency, and evaluate the outcome.</p>
 <p>Let&rsquo;s get underway!</p>
 <h2 id="life-and-times-of-an-officer-cadet">life and times of an officer cadet</h2>
 <p>I can&rsquo;t think of a better candidate for the following exercise than an
@@ -136,7 +141,7 @@ this whole affair to transpire.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 9.00379525s
 </span></span></span></code></pre></div><p>The output looks great! Really great! Wait&hellip;</p>
 <p>No, seriously, wait. Chances are, you&rsquo;re still waiting. You&rsquo;re waiting nine
-seconds, at the minimum. This is, as we say in the military, UNSAT <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
+seconds, at the minimum. This is, as we say in the military, UNSAT <sup id="fnref1:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
 <p>This sort of movement is <em>supposed</em> to be done in unison, so it <em>should</em> be
 taking three seconds, max. We&rsquo;ve tried nothing, and we&rsquo;re all out of ideas.</p>
 <h2 id="everything-everywhere-all-at-once"><del>everything everywhere</del> all at once</h2>
@@ -167,7 +172,7 @@ threads, which delve into the kernel and incur much more overhead.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ go run main.go
 </span></span><span style="display:flex;"><span>58.542µs
 </span></span><span style="display:flex;"><span>Cadet bunce starting turn...
-</span></span></code></pre></div><p>See footnote. <sup id="fnref1:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
+</span></span></code></pre></div><p>See footnote. <sup id="fnref2:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
 <p>Looks like our program executed in a few microseconds, which doesn&rsquo;t leave a lot of room for
 drill. We&rsquo;re left more confused than when we started.</p>
 <p>I encourage you to run this program a few more times. You&rsquo;ll probably get
@@ -297,20 +302,19 @@ any synchronization primitives. Wow!</p>
 <hr>
 <ol>
 <li id="fn:1">
-<p>The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
-By contrast, the Java SE 12 specification is almost 770 pages. Yowza.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Sage advice from <a href="https://www.youtube.com/watch?v=Gu8YiTeU9XU" class="hover-underline-animation">Jake the Dog</a>
+.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:2">
-<p>Unsatisfactory.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
+By contrast, the Java SE 12 specification is almost 770 pages. Yowza.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref2:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:3">
-<p>In JavaScript, this is commonly referred to as an IIFE (pronounced
-&ldquo;iffy&rdquo;), or &ldquo;Immediately Invoked Function Expression&rdquo;.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Unsatisfactory.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:4">
-<p>These are better known as <em>closures</em> (because they &ldquo;close over&rdquo;,
-or capture, locally scoped variables). The compiler is smart enough to pass
-references to the variables, which are made available on the heap.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>In JavaScript, this is commonly referred to as an IIFE (pronounced
+&ldquo;iffy&rdquo;), or &ldquo;Immediately Invoked Function Expression&rdquo;.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </div>

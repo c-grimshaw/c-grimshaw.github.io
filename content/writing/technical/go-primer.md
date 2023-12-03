@@ -4,19 +4,26 @@ date: 2023-11-30T13:40:03-05:00
 draft: false
 ---
 
-Concurrent programming is a difficult thing to get right, and I think that fact
-prevents some programmers from playing with it. And I think that's
-unfortunate.
+Concurrency-- managing multiple threads of execution-- is a difficult thing to
+get right.
 
-With that said, I'm not familiar with an easier programming language to broach
-this subject than Go. It's an objectively simple language [^1] and most C / Python
+The wild west of concurrent execution is a stark departure from the
+well-trodden path of sequential programming, and can quickly introduce errors.
+I think this added complexity prevents some programmers from messing around
+with it.
+
+...And I think that's unfortunate, because suckin' at something is the first
+step to being sorta good at something [^1] .
+
+With that said, I'm not familiar with a better programming language to broach
+this subject than Go. Objectively, it's a simple language [^2] and most
 programmers will find it easy to read. More importantly, some of the
-spectacular language features will help explain things clearly.
+spectacular language features will explain concurrent execution clearly.
 
-We're going to try and model a contrived military activity using normal
-(synchronous) coding practices, exploring some Go syntax as we progress, and
-we'll see how far it takes us. When we run into issues, we're going to
-introduce concurrency, and evaluate the outcome.
+Using a practical example, we're going to try and model a contrived military
+activity using normal (synchronous) coding practices, exploring some Go syntax
+as we progress, and we'll see how far it takes us. Then, when we run into
+issues, we'll introduce concurrency, and evaluate the outcome.
 
 Let's get underway!
 
@@ -348,11 +355,12 @@ The seminal book on concurrency in Go is shockingly {{< link
 >}}Concurrency in Go{{< /link >}}.
 
 
-[^1]: The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
+[^1]: Sage advice from {{< link "https://www.youtube.com/watch?v=Gu8YiTeU9XU" >}}Jake the Dog{{< /link >}}.
+[^2]: The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
   By contrast, the Java SE 12 specification is almost 770 pages. Yowza.
-[^2]: Unsatisfactory.
-[^3]: In JavaScript, this is commonly referred to as an IIFE (pronounced
+[^3]: Unsatisfactory.
+[^4]: In JavaScript, this is commonly referred to as an IIFE (pronounced
     "iffy"), or "Immediately Invoked Function Expression". 
-[^4]: These are better known as *closures* (because they "close over",
+[^5]: These are better known as *closures* (because they "close over",
     or capture, locally scoped variables). The compiler is smart enough to pass
     references to the variables, which are made available on the heap. 

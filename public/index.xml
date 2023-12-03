@@ -13,8 +13,10 @@
       <link>https://example.org/writing/technical/go-primer/</link>
       <pubDate>Thu, 30 Nov 2023 13:40:03 -0500</pubDate>
       <guid>https://example.org/writing/technical/go-primer/</guid>
-      <description>Concurrent programming is a difficult thing to get right, and I think that fact prevents some programmers from playing with it. And I think that&amp;rsquo;s unfortunate.
-With that said, I&amp;rsquo;m not familiar with an easier programming language to broach this subject than Go. It&amp;rsquo;s an objectively simple language 1 and most C / Python programmers will find it easy to read. More importantly, some of the spectacular language features will help explain things clearly.</description>
+      <description>Concurrency&amp;ndash; managing multiple threads of execution&amp;ndash; is a difficult thing to get right.
+The wild west of concurrent execution is a stark departure from the well-trodden path of sequential programming, and can quickly introduce errors. I think this added complexity prevents some programmers from messing around with it.
+&amp;hellip;And I think that&amp;rsquo;s unfortunate, because suckin&amp;rsquo; at something is the first step to being sorta good at something 1 .
+With that said, I&amp;rsquo;m not familiar with a better programming language to broach this subject than Go.</description>
     </item>
   </channel>
 </rss>
