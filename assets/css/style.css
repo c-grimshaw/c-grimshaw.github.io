@@ -64,19 +64,19 @@ a {
 }
 
 p>a {
-  color: rgb(59, 130, 246);
+  color: rgb(131, 172, 246);
 }
 
 .hover-underline-animation {
   display: inline-block;
   text-decoration: none;
   position: relative;
-  color: rgb(59, 130, 246);
+  color: rgb(131, 172, 246);
 }
 
 .hover-underline-animation::after {
   content: '';
-  color: rgb(59, 130, 246);
+  color: rgb(131, 172, 246);
   position: absolute;
   width: 100%;
   transform: scaleX(0);
@@ -84,7 +84,7 @@ p>a {
   bottom: 0;
   left: 0;
   transform-origin: bottom-middle;
-  background-color: rgb(59, 130, 246);
+  background-color: rgb(131, 172, 246);
   transition: transform 0.25s ease-out;
 }
 

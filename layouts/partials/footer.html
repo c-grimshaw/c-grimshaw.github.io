@@ -1,8 +1,16 @@
 <footer>
   <ul>
-    <a href="https://github.com/c-grimshaw">github</a>
-    <a href="https://www.linkedin.com/in/charlie-grimshaw/">linkedin</a>
-    <a href="mailto:cgrimshaw[at]gmail.com">email</a>
-    {{ if .IsHome }}<a href="/writing">writing</a>{{ else }}<a href="/">home</a>{{ end }}
+    <li>
+      <a href="https://github.com/c-grimshaw">github</a>
+    </li>
+    <li>
+      <a href="https://www.linkedin.com/in/charlie-grimshaw/">linkedin</a>
+    </li>
+    <li>
+      <a href="mailto:cgrimshaw[at]gmail.com">email</a>
+    </li>
+    <li>
+      {{ if .IsHome }}<a href="/writing">writing</a>{{ else }}<a href="/">home</a>{{ end }}
+    </li>
   </ul>
 </footer>

@@ -14,9 +14,9 @@
       <pubDate>Thu, 30 Nov 2023 13:40:03 -0500</pubDate>
       <guid>https://example.org/writing/technical/go-primer/</guid>
       <description>Concurrency&amp;ndash; managing multiple threads of execution&amp;ndash; is a difficult thing to get right.
-The wild west of concurrent execution is a stark departure from the well-trodden path of sequential programming, and can quickly introduce errors. I think this added complexity prevents some programmers from messing around with it.
-&amp;hellip;And I think that&amp;rsquo;s unfortunate, because suckin&amp;rsquo; at something is the first step to being sorta good at something 1 .
-With that said, I&amp;rsquo;m not familiar with a better programming language to broach this subject than Go.</description>
+Concurrency is when tasks can start, complete, and run in overlapping time periods.
+The wild west of concurrenct programming is a stark departure from the well-trodden path of sequential programming, and can quickly introduce errors. I think this added complexity prevents some programmers from messing around with it.
+&amp;hellip;And I think that&amp;rsquo;s unfortunate, because suckin&amp;rsquo; at something is the first step to being sorta good at something 1 .</description>
     </item>
   </channel>
 </rss>

@@ -7,7 +7,9 @@ draft: false
 Concurrency-- managing multiple threads of execution-- is a difficult thing to
 get right.
 
-The wild west of concurrent execution is a stark departure from the
+> *Concurrency is when tasks can start, complete, and run in overlapping time periods.*
+
+The wild west of concurrenct programming is a stark departure from the
 well-trodden path of sequential programming, and can quickly introduce errors.
 I think this added complexity prevents some programmers from messing around
 with it.
@@ -21,13 +23,13 @@ programmers will find it easy to read. More importantly, some of the
 spectacular language features will explain concurrent execution clearly.
 
 Using a practical example, we're going to try and model a contrived military
-activity using normal (synchronous) coding practices, exploring some Go syntax
+activity using single-threaded coding practices, exploring some Go syntax
 as we progress, and we'll see how far it takes us. Then, when we run into
 issues, we'll introduce concurrency, and evaluate the outcome.
 
 Let's get underway!
 
-## life and times of an officer cadet
+## life and times of a cadet
 
 I can't think of a better candidate for the following exercise than an
 Officer Cadet. They're programmed to do exactly what you tell them, and they
@@ -124,19 +126,19 @@ this whole affair to transpire.
 // main.go
 // <SNIP>
 
-func main() {
-    cadets := []Cadet{
-        {"boggis"},
-        {"bunce"},
-        {"bean"},
-    }
-
-    start := time.Now()
-    for _, cadet := range cadets {
-        cadet.Turn()        
-    }
-    fmt.Println(time.Since(start))
+cadets := []Cadet{
+    {"boggis"},
+    {"bunce"},
+    {"bean"},
 }
+
+start := time.Now()
+for _, cadet := range cadets {
+    cadet.Turn()        
+}
+elapsed := time.Since(start)
+
+fmt.Println(elapsed)
 
 // $ go run main.go
 // Cadet boggis starting turn...
@@ -197,7 +199,7 @@ $ go run main.go
 Cadet bunce starting turn...
 ```
 
-See footnote. [^2]
+See footnote. [^3]
 
 Looks like our program executed in a few microseconds, which doesn't leave a lot of room for
 drill. We're left more confused than when we started.

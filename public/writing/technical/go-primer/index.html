@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>concurrent drill | grimblog</title>
+  <meta name="description" content="Personal blog of Charlie Grimshaw, software engineer">
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300&family=IBM+Plex+Mono:wght@300&display=swap"
     rel="stylesheet">
   
-  <link rel="stylesheet" href="https://example.org/css/style.min.e52a57a61df5ba5a5b746cf65ae24dae53acdf230e9b4a3b2683d62ce0614d9a.css">
+  <link rel="stylesheet" href="https://example.org/css/style.min.46cb7f6c53ca0e3de52d8703d956ba72b193b9319c14c259dea9a26fc146a497.css">
 </head>
 
 <body>
@@ -25,7 +26,10 @@
 <a href="/writing/">back to writing</a>
 <p>Concurrency&ndash; managing multiple threads of execution&ndash; is a difficult thing to
 get right.</p>
-<p>The wild west of concurrent execution is a stark departure from the
+<blockquote>
+<p><em>Concurrency is when tasks can start, complete, and run in overlapping time periods.</em></p>
+</blockquote>
+<p>The wild west of concurrenct programming is a stark departure from the
 well-trodden path of sequential programming, and can quickly introduce errors.
 I think this added complexity prevents some programmers from messing around
 with it.</p>
@@ -36,11 +40,11 @@ this subject than Go. Objectively, it&rsquo;s a simple language <sup id="fnref:2
 programmers will find it easy to read. More importantly, some of the
 spectacular language features will explain concurrent execution clearly.</p>
 <p>Using a practical example, we&rsquo;re going to try and model a contrived military
-activity using normal (synchronous) coding practices, exploring some Go syntax
+activity using single-threaded coding practices, exploring some Go syntax
 as we progress, and we&rsquo;ll see how far it takes us. Then, when we run into
 issues, we&rsquo;ll introduce concurrency, and evaluate the outcome.</p>
 <p>Let&rsquo;s get underway!</p>
-<h2 id="life-and-times-of-an-officer-cadet">life and times of an officer cadet</h2>
+<h2 id="life-and-times-of-a-cadet">life and times of a cadet</h2>
 <p>I can&rsquo;t think of a better candidate for the following exercise than an
 Officer Cadet. They&rsquo;re programmed to do exactly what you tell them, and they
 possess a little less agency when compared to their non-commissioned
@@ -117,19 +121,19 @@ this whole affair to transpire.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#75715e">// main.go
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// &lt;SNIP&gt;
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadets</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">Cadet</span>{
-</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;boggis&#34;</span>},
-</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;bunce&#34;</span>},
-</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;bean&#34;</span>},
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">start</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()        
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">start</span>))
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">cadets</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">Cadet</span>{
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;boggis&#34;</span>},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;bunce&#34;</span>},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;bean&#34;</span>},
 </span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">start</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">cadet</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">cadets</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cadet</span>.<span style="color:#a6e22e">Turn</span>()        
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">elapsed</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">start</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">elapsed</span>)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// $ go run main.go
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Cadet boggis starting turn...
@@ -172,7 +176,7 @@ threads, which delve into the kernel and incur much more overhead.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ go run main.go
 </span></span><span style="display:flex;"><span>58.542µs
 </span></span><span style="display:flex;"><span>Cadet bunce starting turn...
-</span></span></code></pre></div><p>See footnote. <sup id="fnref2:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
+</span></span></code></pre></div><p>See footnote. <sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
 <p>Looks like our program executed in a few microseconds, which doesn&rsquo;t leave a lot of room for
 drill. We&rsquo;re left more confused than when we started.</p>
 <p>I encourage you to run this program a few more times. You&rsquo;ll probably get
@@ -286,7 +290,7 @@ there&rsquo;s a more idiomatic solution.</p>
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Wait</span>()
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>This is an example of an <em>anonymous function</em> in Go <sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> . Anonymous
+</span></span></code></pre></div><p>This is an example of an <em>anonymous function</em> in Go <sup id="fnref1:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> . Anonymous
 insofar that the function doesn&rsquo;t actually have a name&ndash; we declare it, and
 then immediately execute it. Better still, our locally-scoped function can close
 over <sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>  the <code>wg</code> and <code>cadet</code> variables at each iteration of the loop.</p>
@@ -307,10 +311,10 @@ any synchronization primitives. Wow!</p>
 </li>
 <li id="fn:2">
 <p>The Go programming language has 25 keywords, and the entire language spec is around 50 pages.
-By contrast, the Java SE 12 specification is almost 770 pages. Yowza.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref2:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+By contrast, the Java SE 12 specification is almost 770 pages. Yowza.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:3">
-<p>Unsatisfactory.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Unsatisfactory.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:4">
 <p>In JavaScript, this is commonly referred to as an IIFE (pronounced
@@ -323,10 +327,18 @@ By contrast, the Java SE 12 specification is almost 770 pages. Yowza.&#160;<a hr
     <hr>
     <footer>
   <ul>
-    <a href="https://github.com/c-grimshaw">github</a>
-    <a href="https://www.linkedin.com/in/charlie-grimshaw/">linkedin</a>
-    <a href="mailto:cgrimshaw[at]gmail.com">email</a>
-    <a href="/">home</a>
+    <li>
+      <a href="https://github.com/c-grimshaw">github</a>
+    </li>
+    <li>
+      <a href="https://www.linkedin.com/in/charlie-grimshaw/">linkedin</a>
+    </li>
+    <li>
+      <a href="mailto:cgrimshaw[at]gmail.com">email</a>
+    </li>
+    <li>
+      <a href="/">home</a>
+    </li>
   </ul>
 </footer>
 
